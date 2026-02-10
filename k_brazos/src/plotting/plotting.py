@@ -4,42 +4,42 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from algorithms import Algorithm, EpsilonGreedy
+from ..agents import Agent, EpsilonGreedyAgent
 
 
-def get_algorithm_label(algo: Algorithm) -> str:
+def get_Agent_label(algo: Agent) -> str:
     """
     Genera una etiqueta descriptiva para el algoritmo incluyendo sus parámetros.
 
     :param algo: Instancia de un algoritmo.
-    :type algo: Algorithm
+    :type algo: Agent
     :return: Cadena descriptiva para el algoritmo.
     :rtype: str
     """
     label = type(algo).__name__
-    if isinstance(algo, EpsilonGreedy):
+    if isinstance(algo, EpsilonGreedyAgent):
         label += f" (epsilon={algo.epsilon})"
     # elif isinstance(algo, OtroAlgoritmo):
     #     label += f" (parametro={algo.parametro})"
     # Añadir más condiciones para otros algoritmos aquí
     else:
-        raise ValueError("El algoritmo debe ser de la clase Algorithm o una subclase.")
+        raise ValueError("El algoritmo debe ser de la clase Agent o una subclase.")
     return label
 
 
-def plot_average_rewards(steps: int, rewards: np.ndarray, algorithms: List[Algorithm]):
+def plot_average_rewards(steps: int, rewards: np.ndarray, Agents: List[Agent]):
     """
     Genera la gráfica de Recompensa Promedio vs Pasos de Tiempo.
 
     :param steps: Número de pasos de tiempo.
     :param rewards: Matriz de recompensas promedio.
-    :param algorithms: Lista de instancias de algoritmos comparados.
+    :param Agents: Lista de instancias de algoritmos comparados.
     """
     sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
 
     plt.figure(figsize=(14, 7))
-    for idx, algo in enumerate(algorithms):
-        label = get_algorithm_label(algo)
+    for idx, algo in enumerate(Agents):
+        label = get_Agent_label(algo)
         plt.plot(range(steps), rewards[idx], label=label, linewidth=2)
 
     plt.xlabel('Pasos de Tiempo', fontsize=14)
@@ -50,16 +50,16 @@ def plot_average_rewards(steps: int, rewards: np.ndarray, algorithms: List[Algor
     plt.show()
 
 
-def plot_optimal_selections(steps: int, optimal_selections: np.ndarray, algorithms: List[Algorithm]):
+def plot_optimal_selections(steps: int, optimal_selections: np.ndarray, Agents: List[Agent]):
     """
     Genera la gráfica de Porcentaje de Selección del Brazo Óptimo vs Pasos de Tiempo.
 
     :param steps: Número de pasos de tiempo.
     :param optimal_selections: Matriz de porcentaje de selecciones óptimas.
-    :param algorithms: Lista de instancias de algoritmos comparados.
+    :param Agents: Lista de instancias de algoritmos comparados.
     """
     plt.figure(figsize=(10, 6))
-    for i, algo in enumerate(algorithms):
+    for i, algo in enumerate(Agents):
         plt.plot(range(steps), optimal_selections[i] * 100, label=algo.name)
     
     plt.xlabel('Pasos de Tiempo')
@@ -70,21 +70,21 @@ def plot_optimal_selections(steps: int, optimal_selections: np.ndarray, algorith
     plt.show()
 
 
-def plot_arm_statistics(arm_stats: List[dict], algorithms: List, *args):
+def plot_arm_statistics(arm_stats: List[dict], Agents: List, *args):
     """
     Genera gráficas separadas de Selección de Arms:
                                             Ganancias vs Pérdidas para cada algoritmo.
 
     :param arm_stats: Lista (de diccionarios) con estadísticas de cada brazo por algoritmo.
-    :param algorithms: Lista de instancias de algoritmos comparados.
+    :param Agents: Lista de instancias de algoritmos comparados.
     :param args: Opcional. Parámetros que consideres
 
     """
-    n_algos = len(algorithms)
+    n_algos = len(Agents)
     fig, axes = plt.subplots(1, n_algos, figsize=(5 * n_algos, 5), sharey=True)
     if n_algos == 1: axes = [axes]
 
-    for i, (algo, stats) in enumerate(zip(algorithms, arm_stats)):
+    for i, (algo, stats) in enumerate(zip(Agents, arm_stats)):
         arms = np.arange(len(stats['ganancias']))
         width = 0.35
         
@@ -99,19 +99,19 @@ def plot_arm_statistics(arm_stats: List[dict], algorithms: List, *args):
     plt.tight_layout()
     plt.show()
 
-def plot_regret(steps: int, regret_accumulated: np.ndarray, algorithms: List, *args):
+def plot_regret(steps: int, regret_accumulated: np.ndarray, Agents: List, *args):
     """
     Genera la gráfica de Regret Acumulado vs Pasos de Tiempo
 
     :param steps: Número de pasos de tiempo.
     :param regret_accumulated: Matriz de regret acumulado (algoritmos x pasos).
-    :param algorithms: Lista de instancias de algoritmos comparados.
+    :param Agents: Lista de instancias de algoritmos comparados.
     :param args: Opcional. Parámetros que consideres. P.e. la cota teórica Cte * ln(T)
     """
     plt.figure(figsize=(10, 6))
     time_steps = np.arange(1, steps + 1)
     
-    for i, algo in enumerate(algorithms):
+    for i, algo in enumerate(Agents):
         plt.plot(time_steps, regret_accumulated[i], label=algo.name)
     
     # Si se pasa una constante en args, graficar la cota teórica logarítmica
