@@ -12,8 +12,6 @@ class BinomialArm(Arm):
         """
         self.n = n
         self.p = p
-        # La media de una Binomial es n * p
-        super().__init__(n * p)
 
     def draw(self) -> float:
         """
