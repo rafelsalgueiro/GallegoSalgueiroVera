@@ -46,6 +46,7 @@ class Agent(ABC):
         # Q_{n+1} = Q_n + 1/n * (R_n - Q_n)
         step_size = 1.0 / self.arm_counts[action]
         self.values[action] += step_size * (reward - self.values[action])
+        self.arm_rewards[action] += reward
         
     def reset(self):
         """
