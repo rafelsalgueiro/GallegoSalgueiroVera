@@ -11,7 +11,8 @@ class SoftmaxAgent(Agent):
         tau = max(self.temperature, 1e-5)
         
         # Cálculo de probabilidades mediante Softmax
-        exp_values = np.exp(self.values / tau)
+        preferences = self.values - np.max(self.values)  # Para estabilidad numérica
+        exp_values = np.exp(preferences / tau)
         probs = exp_values / np.sum(exp_values)
         
         return np.random.choice(self.k_arms, p=probs)
