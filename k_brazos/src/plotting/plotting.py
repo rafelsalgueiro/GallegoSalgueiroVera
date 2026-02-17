@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from ..agents import Agent, EpsilonGreedyAgent
+from ..agents import Agent, EpsilonGreedyAgent, UCBAgent, SoftmaxAgent
 
 
 def get_Agent_label(algo: Agent) -> str:
@@ -19,9 +19,10 @@ def get_Agent_label(algo: Agent) -> str:
     label = type(algo).__name__
     if isinstance(algo, EpsilonGreedyAgent):
         label += f" (epsilon={algo.epsilon})"
-    # elif isinstance(algo, OtroAlgoritmo):
-    #     label += f" (parametro={algo.parametro})"
-    # Añadir más condiciones para otros algoritmos aquí
+    elif isinstance(algo, UCBAgent):
+        label += f" (c={algo.c})"
+    elif isinstance(algo, SoftmaxAgent):    
+        label += f" (tau={algo.temperature})"
     else:
         raise ValueError("El algoritmo debe ser de la clase Agent o una subclase.")
     return label

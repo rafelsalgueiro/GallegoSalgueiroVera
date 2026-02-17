@@ -10,8 +10,10 @@ class SoftmaxAgent(Agent):
         # Evitar división por cero o temperaturas extremadamente bajas
         tau = max(self.temperature, 1e-5)
         
-        # Cálculo de probabilidades mediante Softmax
-        exp_values = np.exp(self.values / tau)
+        preferences = self.values / tau
+    
+        max_val = np.max(preferences)
+        exp_values = np.exp(preferences - max_val)
         probs = exp_values / np.sum(exp_values)
         
         return np.random.choice(self.k_arms, p=probs)

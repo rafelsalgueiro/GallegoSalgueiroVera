@@ -2,7 +2,7 @@ from typing import List
 
 import numpy as np
 
-from arms import Arm
+from .arm import Arm
 
 
 class Bandit:
