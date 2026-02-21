@@ -20,7 +20,6 @@ class BernoulliArm(Arm):
     def get_expected_value(self) -> float:
         """
         Devuelve el valor esperado de la distribución de Bernoulli.
-
         :return: Valor esperado de la distribución.
         """
         return self.p
@@ -37,7 +36,6 @@ class BernoulliArm(Arm):
     def generate_arms(cls, k: int, min_p: float = 0.0, max_p: float = 1.0) -> list['BernoulliArm']:
         """
         Genera una lista de brazos de Bernoulli con probabilidades distribuidas uniformemente entre min_p y max_p.
-
         :param k: Número de brazos a generar.
         :param min_p: Probabilidad mínima de éxito.
         :param max_p: Probabilidad máxima de éxito.

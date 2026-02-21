@@ -4,9 +4,30 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from ..agents import Agent
+from ..agents import Agent, EpsilonGreedyAgent, UCBAgent, SoftmaxAgent
 
 sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
+
+def get_Agent_label(algo: Agent) -> str:
+    """
+    Genera una etiqueta descriptiva para el algoritmo incluyendo sus parámetros.
+
+    :param algo: Instancia de un algoritmo.
+    :type algo: Agent
+    :return: Cadena descriptiva para el algoritmo.
+    :rtype: str
+    """
+    label = type(algo).__name__
+    if isinstance(algo, EpsilonGreedyAgent):
+        label += f" (epsilon={algo.epsilon})"
+    elif isinstance(algo, UCBAgent):
+        label += f" (c={algo.c})"
+    elif isinstance(algo, SoftmaxAgent):    
+        label += f" (tau={algo.temperature})"
+    else:
+        raise ValueError("El algoritmo debe ser de la clase Agent o una subclase.")
+    return label
+
 
 def plot_average_rewards(
         steps: int, 
