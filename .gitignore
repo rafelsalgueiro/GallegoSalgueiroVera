@@ -1,4 +1,10 @@
-# Python
-.venv
-**/__pycache__
-**/*.pyc
+# Ignore python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environment directories
+venv/
+env/
+.venv/

@@ -1,4 +1,5 @@
 import numpy as np
+
 from .arm import Arm
 
 class ArmNormal(Arm):
@@ -41,13 +42,14 @@ class ArmNormal(Arm):
         return f"ArmNormal(mu={self.mu}, sigma={self.sigma})"
 
     @classmethod
-    def generate_arms(cls, k: int, mu_min: float = 1, mu_max: float = 10.0):
+    def generate_arms(cls, k: int, mu_min: float = 1, mu_max: float = 10.0, sigma: float = 1.0) -> list:
         """
         Genera k brazos con medias únicas en el rango [mu_min, mu_max].
 
         :param k: Número de brazos a generar.
         :param mu_min: Valor mínimo de la media.
         :param mu_max: Valor máximo de la media.
+        :param sigma: Desviación estándar de los brazos generados.
         :return: Lista de brazos generados.
         """
         assert k > 0, "El número de brazos k debe ser mayor que 0."
@@ -61,8 +63,22 @@ class ArmNormal(Arm):
             mu_values.add(mu)
 
         mu_values = list(mu_values)
-        sigma = 1.0
 
         arms = [ArmNormal(mu, sigma) for mu in mu_values]
 
         return arms
+    
+    def get_lai_robbins_term(self, optimal_value: float) -> float:
+        """
+        Calcula el término de Lai-Robbins para este brazo.
+
+        :param optimal_value: El valor esperado del brazo óptimo.
+        :return: El término de Lai-Robbins para este brazo.
+        """
+        delta = optimal_value - self.mu
+
+        if delta <= 1e-9:
+            return 0.0
+        
+        # 2 * sigma^2 / delta, asumiendo que el óptimo tiene la misma desviación estándar
+        return 2 * (self.sigma ** 2) / delta

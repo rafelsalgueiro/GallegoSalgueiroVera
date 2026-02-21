@@ -29,3 +29,13 @@ class Arm(ABC):
         Calculates and returns the expected value of the arm's reward.
         """
         raise NotImplementedError("This method must be implemented by the subclass.")
+    
+    @abstractmethod
+    def get_lai_robbins_term(self, optimal_value: float) -> float:
+        """
+        Calculates the Lai-Robbins term for the arm based on its expected value and the optimal value.
+
+        :param optimal_value: The expected reward of the optimal arm.
+        :return: The Lai-Robbins term for this arm.
+        """
+        raise NotImplementedError("This method must be implemented by the subclass.")

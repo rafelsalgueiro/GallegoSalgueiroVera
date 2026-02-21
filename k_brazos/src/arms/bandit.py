@@ -31,15 +31,16 @@ class Bandit:
         reward = self.arms[index].pull()
         return reward
 
-    def get_optimal_arm(self) -> int:
+    def get_optimal_arm(self) -> tuple[int]:
         """
         Identifies the arm with the highest expected reward.
 
-        :return: Index of the optimal arm.
+        :return: Index of the optimal arm and the optimal average value
         """
 
         optimal_arm = np.argmax(self.expected_rewards)
-        return optimal_arm
+        optimal_value = np.max(self.expected_rewards)
+        return optimal_arm, optimal_value
 
     def get_expected_rewards(self) -> List[float]:
         """
@@ -70,3 +71,18 @@ class Bandit:
         """
         arms_description = ", ".join([str(arm) for arm in self.arms])
         return f"Bandit with {self.k} arms: {arms_description}"
+    
+    def get_theoretical_constant(self) -> float:
+        """
+        Calcula la constante C teórica para la cota de Lai-Robbins del regret acumulado.
+        """
+
+        optimal_arm, optimal_value = self.get_optimal_arm()
+        c = 0.0
+        
+        for arm in self.arms:
+            if optimal_arm == arm:
+                continue
+            c += arm.get_lai_robbins_term(optimal_value)
+            
+        return c
