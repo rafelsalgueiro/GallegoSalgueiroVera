@@ -41,12 +41,12 @@ class Agent(ABC):
         """
         self.n_steps += 1
         self.arm_counts[action] += 1
+        self.arm_rewards[action] += reward
         
         # Fórmula de actualización incremental para el valor estimado (Q)
         # Q_{n+1} = Q_n + 1/n * (R_n - Q_n)
         step_size = 1.0 / self.arm_counts[action]
         self.values[action] += step_size * (reward - self.values[action])
-        self.arm_rewards[action] += reward
         
     def reset(self):
         """
@@ -57,3 +57,11 @@ class Agent(ABC):
         self.arm_counts.fill(0)
         self.arm_rewards.fill(0)
         self.values.fill(0)
+
+    @property
+    def label(self) -> str:
+        """
+        Devuelve el nombre del agente para su uso en gráficos y reportes.
+        """
+        return self.name
+    

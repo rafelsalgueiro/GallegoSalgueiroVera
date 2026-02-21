@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 from ..agents import Agent, EpsilonGreedyAgent, UCBAgent, SoftmaxAgent
 
+sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
 
 def get_Agent_label(algo: Agent) -> str:
     """
@@ -28,46 +29,70 @@ def get_Agent_label(algo: Agent) -> str:
     return label
 
 
-def plot_average_rewards(steps: int, rewards: np.ndarray, Agents: List[Agent]):
+def plot_average_rewards(
+        steps: int, 
+        rewards: np.ndarray, 
+        Agents: List[Agent], 
+        window_size: int = 1,
+        optimal_value: float = None
+    ):
     """
     Genera la gráfica de Recompensa Promedio vs Pasos de Tiempo.
 
     :param steps: Número de pasos de tiempo.
     :param rewards: Matriz de recompensas promedio.
     :param Agents: Lista de instancias de algoritmos comparados.
+    :param window_size: Tamaño de la ventana para el suavizado de media móvil (opcional).
+    :param optimal_value: Valor óptimo para graficar una línea de referencia (opcional).
     """
-    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
+    if window_size is not None and (window_size <= 0 or window_size > steps):
+        raise ValueError("El tamaño de la ventana debe ser un entero positivo menor o igual al número de pasos.")
 
     plt.figure(figsize=(14, 7))
-    for idx, algo in enumerate(Agents):
-        label = get_Agent_label(algo)
-        plt.plot(range(steps), rewards[idx], label=label, linewidth=2)
 
+    if optimal_value:
+        plt.axhline(optimal_value, color='k', linestyle='--', label='Valor Óptimo')
+
+    for idx, agent in enumerate(Agents):
+        label = agent.label
+        # Suavizado con media móvil
+        smoothed_rewards = np.convolve(rewards[idx], np.ones(window_size)/window_size, mode='valid')
+        plt.plot(range(window_size-1, steps), smoothed_rewards, label=label, linewidth=2)
     plt.xlabel('Pasos de Tiempo', fontsize=14)
-    plt.ylabel('Recompensa Promedio', fontsize=14)
+    ylbl = 'Recompensa Promedio' + (f' (suavizado de tamaño {window_size})' if window_size else '')
+    plt.ylabel(ylbl, fontsize=14)
     plt.title('Recompensa Promedio vs Pasos de Tiempo', fontsize=16)
     plt.legend(title='Algoritmos')
     plt.tight_layout()
     plt.show()
 
 
-def plot_optimal_selections(steps: int, optimal_selections: np.ndarray, Agents: List[Agent]):
+def plot_optimal_selections(
+        steps: int, 
+        optimal_selections: np.ndarray, 
+        Agents: List[Agent],
+        window_size: int = 1
+    ):
     """
     Genera la gráfica de Porcentaje de Selección del Brazo Óptimo vs Pasos de Tiempo.
 
     :param steps: Número de pasos de tiempo.
     :param optimal_selections: Matriz de porcentaje de selecciones óptimas.
     :param Agents: Lista de instancias de algoritmos comparados.
+    :param window_size: Tamaño de la ventana para el suavizado de media móvil (opcional).
     """
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(14, 7))
     for i, algo in enumerate(Agents):
-        plt.plot(range(steps), optimal_selections[i] * 100, label=algo.name)
+        # Suavizado con media móvil
+        smoothed_selections = np.convolve(optimal_selections[i], np.ones(window_size)/window_size, mode='valid')
+        plt.plot(range(window_size-1, steps), smoothed_selections * 100, label=algo.name)
     
     plt.xlabel('Pasos de Tiempo')
-    plt.ylabel('% Selección Brazo Óptimo')
+    ylbl = '% Brazo Óptimo' + (f' (suavizado de tamaño {window_size})' if window_size else '')
+    plt.ylabel(ylbl)
     plt.title('Rendimiento: Selección del Brazo Óptimo')
-    plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.legend(title='Algoritmos')
+    plt.tight_layout()
     plt.show()
 
 

@@ -17,7 +17,7 @@ class BinomialArm(Arm):
         """
         Retorna una recompensa basada en la distribución binomial.
         """
-        return float(np.random.binomial(self.n, self.p)) / self.n  # Normalizamos para que la recompensa esté entre 0 y 1
+        return float(np.random.binomial(self.n, self.p)) / self.n  # Normalizamos la recompensa al rango [0, 1]
     
     def get_expected_value(self) -> float:
         """
