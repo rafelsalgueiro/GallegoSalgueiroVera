@@ -59,6 +59,9 @@ def plot_optimal_selections(
     :param Agents: Lista de instancias de algoritmos comparados.
     :param window_size: Tamaño de la ventana para el suavizado de media móvil (opcional).
     """
+    if window_size is not None and (window_size <= 0 or window_size > steps):
+        raise ValueError("El tamaño de la ventana debe ser un entero positivo menor o igual al número de pasos.")
+
     plt.figure(figsize=(14, 7))
     for i, algo in enumerate(Agents):
         # Suavizado con media móvil
