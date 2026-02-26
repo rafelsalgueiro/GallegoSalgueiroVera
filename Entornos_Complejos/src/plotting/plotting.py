@@ -9,24 +9,6 @@ from ..agents import BaseAgent
 # Configuración visual global al estilo de tu archivo
 sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
 
-def get_agent_label(algo: BaseAgent) -> str:
-    """
-    Genera una etiqueta descriptiva para el algoritmo incluyendo sus parámetros.
-    
-    :param algo: Instancia de un algoritmo tabular.
-    :type algo: BaseAgent
-    :return: Cadena descriptiva para el algoritmo.
-    :rtype: str
-    """
-    label = type(algo).__name__
-    # Si quisieras añadir hiperparámetros a la etiqueta
-    if hasattr(algo, 'alpha') and hasattr(algo, 'gamma'):
-        label += f" (α={algo.alpha}, γ={algo.gamma})"
-    elif hasattr(algo, 'gamma'):
-         label += f" (γ={algo.gamma})"
-    return label
-
-
 def plot_episode_lengths(
         episode_lengths: List[int], 
         title: str = "Longitud del Episodio en el Tiempo",
