@@ -135,3 +135,44 @@ def plot_success_rate(
     plt.legend()
     plt.tight_layout()
     plt.show()
+
+import time
+import pygame
+
+def evaluate_flappy_bird_agent(agent, env, num_episodes=3, render=True, fps=30):
+    """
+    Evalúa gráficamente (o lógicamente) un agente en el entorno Flappy Bird y printea la colisión y puntuación final.
+    Maneja dependencias de pygame si el motor de renderizado falla por instalación.
+
+    :param agent: El agente entrenado con un método get_action(state).
+    :param env: Entorno de evaluación configurado (preferiblemente make_flappy_bird_env).
+    :param num_episodes: Número de episodios de evaluación.
+    :param render: Si es verdadero se asume que el env tiene render_mode="human" y se hace un sleep.
+    :param fps: Puntos por segundo en los que se bloquea el render para que sea apreciable al ojo humano.
+    """    
+    # Manejo temporal de la excepción de Pygame si la biblioteca de C++ no soporta PNG en el venv actual
+    try:
+        env.reset()
+    except Exception as e:
+        print(f"Error inicializando gráfica del entorno: {str(e)}")
+        return
+
+    for ep in range(num_episodes):
+        state, info = env.reset()
+        done = False
+        score = 0
+        frames = 0
+        
+        while not done:
+            action = agent.get_action(state)
+            state, reward, terminated, truncated, info = env.step(action)
+            done = terminated or truncated
+            frames += 1
+            
+            if render:
+                time.sleep(1.0 / fps)
+                
+            if done:
+                score = info.get('score', 0)
+                print(f"[Visual-Ep {ep+1}] Agente colisionó en el timestep {frames}. Puntuación final: {score}")
+                break
