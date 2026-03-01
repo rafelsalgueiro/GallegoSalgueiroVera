@@ -11,10 +11,18 @@ from .td_agents import TDAgent
 
 class DQNNet(nn.Module):
     """
-    Neural network for approximating Q(s, a) in a Deep Q-Network.
-    Uses a standard MLP with ReLU activations.
+    Red neuronal para aproximar la función de valor Q(s, a) en un algoritmo Deep Q-Network.
+    Utiliza un Perceptrón Multicapa (MLP) estándar con funciones de activación ReLU.
+    Intenta predecir la recompensa esperada de tomar cada acción posible en un estado dado.
     """
-    def __init__(self, input_dim, output_dim, hidden_dim=128):
+    def __init__(self, input_dim: int, output_dim: int, hidden_dim: int = 128):
+        """
+        Inicializa la red neuronal.
+
+        :param input_dim: Dimensión del espacio de estados (entradas). Ej: 12 para Flappy Bird.
+        :param output_dim: Número total de acciones posibles (salidas). Ej: 2 (caer, saltar).
+        :param hidden_dim: Número de neuronas en las capas ocultas.
+        """
         super(DQNNet, self).__init__()
         self.net = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
@@ -24,16 +32,30 @@ class DQNNet(nn.Module):
             nn.Linear(hidden_dim, output_dim),
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Propagación hacia adelante (forward pass) de la red para calcular los Valores Q.
+
+        :param x: Tensor de PyTorch que representa el estado o un lote (batch) de estados.
+        :return: Tensor con los Valores Q estimados para cada acción posible.
+        """
         return self.net(x)
 
 
 class DQNReplayBuffer:
     """
-    Experience replay buffer for DQN (does not store next_action,
-    since DQN is off-policy and uses max over all actions).
+    Almacena las transiciones del agente para romper la correlación temporal 
+    de los datos durante el entrenamiento, estabilizando así el aprendizaje.
+    
+    Al ser DQN un algoritmo off-policy, no necesitamos almacenar la siguiente acción.
     """
     def __init__(self, capacity: int, state_dim: int):
+        """
+        Inicializa el buffer de repetición.
+
+        :param capacity: Capacidad máxima del búfer (número de transiciones a recordar).
+        :param state_dim: Dimensión del vector de estado del entorno.
+        """
         self.capacity = capacity
         self.states = np.zeros((capacity, state_dim), dtype=np.float32)
         self.actions = np.zeros((capacity, 1), dtype=np.int64)
@@ -41,11 +63,20 @@ class DQNReplayBuffer:
         self.next_states = np.zeros((capacity, state_dim), dtype=np.float32)
         self.dones = np.zeros((capacity, 1), dtype=bool)
 
-        self.ptr = 0
-        self.size = 0
+        self.ptr = 0  # Siguiente transición
+        self.size = 0 # Cantidad actual de elementos almacenados
 
-    def add(self, state, action, reward, next_state, done):
-        """Add a transition to the buffer, overwriting oldest if full."""
+    def add(self, state: np.ndarray, action: int, reward: float, next_state: np.ndarray, done: bool):
+        """
+        Añade una nueva transición al buffer. Si el bufer está lleno, sobrescribe 
+        la transición más antigua (cola circular).
+
+        :param state: Estado actual observado por el agente.
+        :param action: Acción tomada por el agente en el estado actual.
+        :param reward: Recompensa recibida tras ejecutar la acción.
+        :param next_state: Siguiente estado observado tras la transición.
+        :param done: Booleano que indica si el episodio ha terminado (terminal o truncado).
+        """
         self.states[self.ptr] = state
         self.actions[self.ptr] = action
         self.rewards[self.ptr] = reward
@@ -55,9 +86,18 @@ class DQNReplayBuffer:
         self.ptr = (self.ptr + 1) % self.capacity
         self.size = min(self.size + 1, self.capacity)
 
-    def sample(self, batch_size):
-        """Return a random batch of transitions as PyTorch tensors."""
+    def sample(self, batch_size: int):
+        """
+        Extrae un batch aleatorio de transiciones para entrenar la red neuronal.
+        Convierte automáticamente los arrays de NumPy en Tensores de PyTorch.
+
+        :param batch_size: Tamaño del lote de datos a extraer.
+        :return: Una tupla de tensores de PyTorch: 
+                 (estados, acciones, recompensas, siguientes_estados, dones).
+        """
+        # Selección aleatoria de índices sin reemplazo
         idxs = np.random.choice(self.size, size=batch_size, replace=False)
+        
         return (
             torch.FloatTensor(self.states[idxs]),
             torch.LongTensor(self.actions[idxs]),
@@ -66,38 +106,18 @@ class DQNReplayBuffer:
             torch.BoolTensor(self.dones[idxs]),
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Devuelve el número actual de transiciones almacenadas en el búfer.
+        Permite usar la función len(buffer) directamente sobre el objeto.
+        """
         return self.size
 
 
 class DQNAgent(TDAgent):
     """
-    Deep Q-Network (DQN) agent with optional target network.
-
-    Key features:
-      - Off-policy learning: uses max_a Q(s', a) as the bootstrap target.
-      - Experience Replay: decorrelates training samples.
-      - Target Network (optional): stabilises training by keeping a slowly-
-        updated copy of the Q-network for computing TD targets.
-
-    Parameters
-    ----------
-    env : gymnasium.Env
-        The environment to interact with.
-    alpha : float
-        Learning rate for the Adam optimiser.
-    gamma : float
-        Discount factor.
-    epsilon : float
-        Initial exploration rate for epsilon-greedy policy.
-    hidden_dim : int
-        Number of units in each hidden layer of the Q-network.
-    use_target_network : bool
-        Whether to use a separate target network.
-    target_update_freq : int
-        How often (in optimisation steps) to hard-copy weights to target net.
-    grad_clip : float or None
-        If not None, clip gradient norms to this value.
+    Agente Deep Q-Network (DQN) con red objetivo (Target Network) opcional, 
+    Experience Replay y decaimiento de exploración (epsilon-decay).
     """
 
     def __init__(
@@ -105,48 +125,72 @@ class DQNAgent(TDAgent):
         env,
         alpha=1e-3,
         gamma=0.99,
-        epsilon=0.1,
+        epsilon_start=1.0,
+        epsilon_min=0.01,
+        epsilon_decay=0.995,
         hidden_dim=128,
         use_target_network=True,
         target_update_freq=1000,
         grad_clip=1.0,
+        device="cpu"
     ):
-        super().__init__(env, alpha, gamma, epsilon)
+        """Inicializa el agente DQN con sus hiperparámetros y redes neuronales.
+        
+        :param env: Entorno de con espacios de observación y acción definidos.
+        :param alpha: Tasa de aprendizaje para el optimizador de la red neuronal.
+        :param gamma: Factor de descuento para el cálculo de la recompensa futura.
+        :param epsilon_start: Valor inicial de epsilon para la política epsilon-greedy.
+        :param epsilon_min: Valor mínimo de epsilon para asegurar algo de exploración.
+        :param epsilon_decay: Factor multiplicativo para reducir epsilon después de cada episodio.
+        :param hidden_dim: Número de neuronas en las capas ocultas de la red neuronal
+        :param use_target_network: Si True, utiliza una red objetivo separada para estabilizar el entrenamiento.
+        :param target_update_freq: Frecuencia (en pasos de optimización) para actualizar la red objetivo.
+        :param grad_clip: Valor máximo para el recorte de gradientes (None para no usar).
+        :param device: Dispositivo para ejecutar el modelo ("cpu" o "cuda").
+        """
+        super().__init__(env, alpha, gamma, epsilon_start)
+        
+        self.epsilon_min = epsilon_min
+        self.epsilon_decay = epsilon_decay
+        self.device = torch.device(device)
 
         self.state_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.n
 
-        # Online (policy) network
-        self.q_net = DQNNet(self.state_dim, self.action_dim, hidden_dim)
+        # Red principal (Policy)
+        self.q_net = DQNNet(self.state_dim, self.action_dim, hidden_dim).to(self.device)
         self.optimizer = optim.Adam(self.q_net.parameters(), lr=self.alpha)
-        self.criterion = nn.SmoothL1Loss()  # Huber loss — more robust than MSE
+        self.criterion = nn.SmoothL1Loss() 
 
-        # Target network
+        # Red objetivo (Target)
         self.use_target_network = use_target_network
         self.target_update_freq = target_update_freq
         self.grad_clip = grad_clip
         self._optim_steps = 0
 
         if self.use_target_network:
-            self.target_net = copy.deepcopy(self.q_net)
-            self.target_net.eval()  # target net never trains directly
+            self.target_net = copy.deepcopy(self.q_net).to(self.device)
+            self.target_net.eval()  
         else:
-            self.target_net = self.q_net  # alias – same network
+            self.target_net = self.q_net  
 
-    # ------------------------------------------------------------------
-    # Inference
-    # ------------------------------------------------------------------
+    def decay_epsilon(self):
+        """Reduce epsilon multiplicándolo por su factor de decaimiento hasta el límite mínimo."""
+        if self.epsilon > self.epsilon_min:
+            self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
+
     def get_q_value(self, state, action=None):
-        """Return Q-values from the *online* network (no gradient)."""
-        state_tensor = torch.FloatTensor(state).unsqueeze(0)
+        """Calcula los Valores Q del estado actual usando la red principal (sin gradientes)."""
+        state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         with torch.no_grad():
-            q_values = self.q_net(state_tensor).numpy()[0]
+            q_values = self.q_net(state_tensor).cpu().numpy()[0]
+        
         if action is not None:
             return q_values[action]
         return q_values
 
     def get_action(self, state):
-        """Epsilon-greedy action selection."""
+        """Selecciona una acción siguiendo una política epsilon-greedy."""
         if random.random() < self.epsilon:
             return self.env.action_space.sample()
 
@@ -154,58 +198,39 @@ class DQNAgent(TDAgent):
         max_q = np.max(q_values)
         best_actions = np.where(q_values == max_q)[0]
         return random.choice(best_actions)
-
-    # ------------------------------------------------------------------
-    # Learning
-    # ------------------------------------------------------------------
+    
     def update(self, state, action, reward, next_state, done):
-        """Single-transition DQN update (mainly for reference / debugging)."""
-        state_t = torch.FloatTensor(state).unsqueeze(0)
-        next_state_t = torch.FloatTensor(next_state).unsqueeze(0)
-
-        current_q = self.q_net(state_t)[0, action]
-
-        with torch.no_grad():
-            if done:
-                target_q = torch.tensor(reward, dtype=torch.float32)
-            else:
-                next_q_max = self.target_net(next_state_t).max(1)[0]
-                target_q = torch.tensor(reward, dtype=torch.float32) + self.gamma * next_q_max
-
-        loss = self.criterion(current_q, target_q)
-
-        self.optimizer.zero_grad()
-        loss.backward()
-        if self.grad_clip is not None:
-            nn.utils.clip_grad_norm_(self.q_net.parameters(), self.grad_clip)
-        self.optimizer.step()
-
-        self._optim_steps += 1
-        self._maybe_update_target()
-
-        return loss.item()
+        """Utiliza la transición para actualizar los pesos de la red principal."""
+        states = torch.FloatTensor(np.array([state]))
+        actions = torch.LongTensor([[action]])
+        rewards = torch.FloatTensor([[reward]])
+        next_states = torch.FloatTensor(np.array([next_state]))
+        dones = torch.BoolTensor([[done]])
+        return self.update_batch(states, actions, rewards, next_states, dones)
 
     def update_batch(self, states, actions, rewards, next_states, dones):
-        """
-        Update the Q-network using a mini-batch sampled from a replay buffer.
-        This is the standard DQN training step.
-        """
-        # Q(s, a) from online network
-        current_q_values = self.q_net(states)
-        current_q = current_q_values.gather(1, actions).squeeze(1)
+        """Actualiza los pesos de la red principal usando un lote de transiciones (Experience Replay)."""
+        states = states.to(self.device)
+        actions = actions.to(self.device)
+        rewards = rewards.to(self.device)
+        next_states = next_states.to(self.device)
+        dones = dones.to(self.device)
 
-        # max_a' Q_target(s', a')  — no gradient
+        # Predicciones actuales Q(s, a)
+        current_q = self.q_net(states).gather(1, actions).squeeze(1)
+
+        # Valor máximo esperado en el siguiente estado: max_a' Q_target(s', a')
         with torch.no_grad():
-            next_q_values = self.target_net(next_states)
-            next_q_max = next_q_values.max(1)[0]
+            next_q_max = self.target_net(next_states).max(1)[0]
 
-        # TD target: r + γ·max Q(s',a')  (0 when done)
+        # Objetivo TD: r + gamma * max_a' Q(s', a')
         target_q = rewards.squeeze(1) + self.gamma * next_q_max * (~dones.squeeze(1))
 
+        # Cálculo de pérdida y retropropagación
         loss = self.criterion(current_q, target_q)
-
         self.optimizer.zero_grad()
         loss.backward()
+        
         if self.grad_clip is not None:
             nn.utils.clip_grad_norm_(self.q_net.parameters(), self.grad_clip)
         self.optimizer.step()
@@ -215,36 +240,30 @@ class DQNAgent(TDAgent):
 
         return loss.item()
 
-    # ------------------------------------------------------------------
-    # Target network management
-    # ------------------------------------------------------------------
     def _maybe_update_target(self):
-        """Hard-copy online weights → target network every N steps."""
+        """Copia los pesos de la red principal a la red objetivo según la frecuencia definida."""
         if self.use_target_network and self._optim_steps % self.target_update_freq == 0:
             self.target_net.load_state_dict(self.q_net.state_dict())
 
     def sync_target_network(self):
-        """Manually synchronise the target network with the online network."""
+        """Fuerza la sincronización manual inmediata de la red objetivo."""
         if self.use_target_network:
             self.target_net.load_state_dict(self.q_net.state_dict())
 
-    # ------------------------------------------------------------------
-    # Persistence
-    # ------------------------------------------------------------------
     def save_weights(self, path):
-        """Save the online Q-network weights."""
+        """Guarda los pesos del modelo en disco."""
         torch.save(self.q_net.state_dict(), path)
-        print(f"Weights saved to {path}")
+        print(f"Pesos guardados en {path}")
 
     def load_weights(self, path):
-        """Load weights into the online network (and target network if used)."""
+        """Carga los pesos desde el disco en la red principal y en la objetivo."""
         if os.path.exists(path):
             self.q_net.load_state_dict(torch.load(path, weights_only=True))
             if self.use_target_network:
                 self.target_net.load_state_dict(self.q_net.state_dict())
             self.q_net.eval()
-            print(f"Weights loaded from {path}")
+            print(f"Pesos cargados desde {path}")
             return True
         else:
-            print(f"Error: path {path} not found.")
+            print(f"Error: Ruta {path} no encontrada.")
             return False
