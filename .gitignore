@@ -8,3 +8,15 @@ __pycache__/
 venv/
 env/
 .venv/
+
+# Ignore saved models
+models/
+
+# Ignore saved weights
+weights/
+
+# Ignore saved logs
+logs/
+
+# Ignore saved results
+results/
