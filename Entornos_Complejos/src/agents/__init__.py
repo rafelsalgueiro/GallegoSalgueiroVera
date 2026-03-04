@@ -8,8 +8,8 @@ from .td_agents_dqn import DQNAgent, DQNReplayBuffer
 from .replay_buffer import ReplayBuffer
 
 __all__ = [
-    "MCAgentFirstVisit", 
-    "MCAgentEveryVisit", 
+    "MCOnPolicyAgent", 
+    "MCOffPolicyAgent", 
     "QLearningAgent", 
     "SarsaAgent",
     "SemiGradientSarsaAgent",

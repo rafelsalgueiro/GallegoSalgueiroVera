@@ -27,7 +27,11 @@ class SemiGradientSarsaAgent(TDAgent):
     Ideal para espacios de estado continuos.
     """
     def __init__(self, env, alpha=1e-3, gamma=0.99, epsilon=0.1, hidden_dim=64):
-        super().__init__(env, alpha, gamma, epsilon)
+        # Inicialización directa sin q_table (no usamos tabla, usamos red neuronal)
+        self.env = env
+        self.alpha = alpha
+        self.gamma = gamma
+        self.epsilon = epsilon
         
         # El espacio de estado en FlappyBird sin lidar es de 12 dimensiones
         self.state_dim = env.observation_space.shape[0] 
@@ -126,7 +130,7 @@ class SemiGradientSarsaAgent(TDAgent):
     def load_weights(self, path):
         """Carga el state_dict si existe"""
         if os.path.exists(path):
-            self.q_net.load_state_dict(torch.load(path))
+            self.q_net.load_state_dict(torch.load(path, weights_only=True))
             # Modo evaluación (sin afecto real en MSE por no tener dropout/batchnorm, pero es buena práctica)
             self.q_net.eval()
             print(f"Pesos cargados correctamente desde {path}")
