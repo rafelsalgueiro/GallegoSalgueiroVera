@@ -27,11 +27,9 @@ class SemiGradientSarsaAgent(TDAgent):
     Ideal para espacios de estado continuos.
     """
     def __init__(self, env, alpha=1e-3, gamma=0.99, epsilon=0.1, hidden_dim=64):
-        # Inicialización directa sin q_table (no usamos tabla, usamos red neuronal)
-        self.env = env
-        self.alpha = alpha
-        self.gamma = gamma
-        self.epsilon = epsilon
+        # Llamamos al constructor padre. La q_table no se usa, pero mantenemos
+        # la jerarquía de herencia consistente.
+        super().__init__(env, alpha=alpha, gamma=gamma, epsilon=epsilon)
         
         # El espacio de estado en FlappyBird sin lidar es de 12 dimensiones
         self.state_dim = env.observation_space.shape[0] 

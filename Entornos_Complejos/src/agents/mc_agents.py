@@ -65,6 +65,7 @@ class MCOffPolicyAgent(BaseAgent):
     def update(self):
         G = 0.0
         W = 1.0 # Peso de importancia inicial
+        n_actions = self.env.action_space.n
         
         for state, action, reward in reversed(self.episode_memory):
             G = self.gamma * G + reward
@@ -77,17 +78,19 @@ class MCOffPolicyAgent(BaseAgent):
             current_q = self.get_q_value(state, action)
             self.q_table[sa_pair] = current_q + (W / self.c_table[sa_pair]) * (G - current_q)
             
-            # Buscamos la acción óptima (política objetivo)
-            q_values = [self.get_q_value(state, a) for a in range(self.env.action_space.n)]
+            # Política objetivo determinista: acción greedy con tie-breaking consistente
+            q_values = [self.get_q_value(state, a) for a in range(n_actions)]
             best_actions = [a for a, q in enumerate(q_values) if q == max(q_values)]
+            target_action = best_actions[0]  # Tie-breaking determinista y consistente
             
             # Si la acción tomada no coincide con la política objetivo, el peso es 0 y se corta la cadena
-            if action not in best_actions:
+            if action != target_action:
                 break 
             
             # Actualizamos W dividiendo por la probabilidad de la política de comportamiento
-            # Probabilidad de tomar la acción greedy en epsilon-greedy:
-            prob_b = (1 - self.epsilon) + (self.epsilon / self.env.action_space.n)
+            # Probabilidad de tomar esta acción greedy en epsilon-greedy con k acciones empatadas:
+            n_best = len(best_actions)
+            prob_b = (1 - self.epsilon) / n_best + (self.epsilon / n_actions)
             W = W / prob_b
             
         self.episode_memory = []

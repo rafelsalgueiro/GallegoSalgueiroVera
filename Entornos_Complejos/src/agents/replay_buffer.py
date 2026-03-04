@@ -3,7 +3,13 @@ import random
 import torch
 
 class ReplayBuffer:
-    """Buffer de repetición de experiencias tipo memoria cíclica."""
+    """Buffer de repetición de experiencias tipo memoria cíclica.
+    
+    NOTA: Este buffer almacena next_action, pensado para SARSA. Sin embargo, 
+    usar experience replay con SARSA (on-policy) viola la propiedad on-policy, 
+    ya que las transiciones fueron generadas bajo políticas anteriores. 
+    Para uso correcto off-policy, considerar Expected SARSA o Q-Learning.
+    """
     
     def __init__(self, capacity: int, state_dim: int):
         self.capacity = capacity

@@ -8,6 +8,13 @@ class FlappyBirdRewardWrapper(gym.Wrapper):
     """
     def __init__(self, env, alpha=0.5, count_negative_rewards=False):
         super().__init__(env)
+        # Verificar que no se esté usando lidar, ya que los índices de observación
+        # son específicos para el modo sin lidar (12-dim).
+        if hasattr(env.unwrapped, 'use_lidar') and env.unwrapped.use_lidar:
+            raise ValueError(
+                "FlappyBirdRewardWrapper no es compatible con observaciones lidar. "
+                "Los índices de observación usados para reward shaping solo son válidos con use_lidar=False."
+            )
         self.alpha = alpha
         self.count_negative_rewards = count_negative_rewards
 
@@ -23,6 +30,11 @@ class FlappyBirdRewardWrapper(gym.Wrapper):
         
         # Aplicar Reward Shaping solo si el agente sigue vivo
         if not terminated:
+            # Gymnasium nativo penaliza con -0.5 si el pájaro roza el techo de la pantalla.
+            # Clippeamos ANTES de aplicar el shaping para no enmascarar la penalización.
+            if reward < 0 and not self.count_negative_rewards:
+                reward = 0.0
+            
             next_top_pipe_y = obs[4]
             next_bottom_pipe_y = obs[5]
             player_y = obs[9]
@@ -35,10 +47,6 @@ class FlappyBirdRewardWrapper(gym.Wrapper):
             shaping_bonus = self.alpha * proximity
             
             reward += shaping_bonus
-            
-            # Gymnasium nativo penaliza con -0.5 si el pájaro roza el techo de la pantalla.
-            if reward < 0 and not self.count_negative_rewards:
-                reward = 0.0
             
         return obs, reward, terminated, truncated, info
 
