@@ -77,11 +77,11 @@ class Bandit:
         Calcula la constante C teórica para la cota de Lai-Robbins del regret acumulado.
         """
 
-        optimal_arm, optimal_value = self.get_optimal_arm()
+        optimal_arm_idx, optimal_value = self.get_optimal_arm()
         c = 0.0
         
-        for arm in self.arms:
-            if optimal_arm == arm:
+        for i, arm in enumerate(self.arms):
+            if i == optimal_arm_idx:
                 continue
             c += arm.get_lai_robbins_term(optimal_value)
             
