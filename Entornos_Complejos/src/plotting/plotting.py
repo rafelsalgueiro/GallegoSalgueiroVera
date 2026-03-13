@@ -112,13 +112,13 @@ def plot_dqn_loss(losses: List[float], window_size: int = 100, title: str = "Evo
         return
 
     plt.figure(figsize=(14, 7))
-    plt.plot(losses, color='lightgray', alpha=0.4, label='Pérdida (Loss) por step')
+    plt.plot(losses, color='lightgray', alpha=0.4, label='Pérdida media por episodio')
     
     if window_size > 1 and len(losses) >= window_size:
         smoothed_loss = np.convolve(losses, np.ones(window_size)/window_size, mode='valid')
         plt.plot(range(window_size - 1, len(losses)), smoothed_loss, color='purple', linewidth=2, label=f'Media móvil (n={window_size})')
 
-    plt.xlabel('Pasos de Optimización (Steps)')
+    plt.xlabel('Episodios')
     plt.ylabel('Loss')
     plt.title(title)
     

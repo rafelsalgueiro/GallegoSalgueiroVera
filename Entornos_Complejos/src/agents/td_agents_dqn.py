@@ -45,13 +45,14 @@ class DQNReplayBuffer:
     Memoria circular para almacenar transiciones y romper la correlación temporal 
     durante el entrenamiento (Experience Replay).
     """
-    def __init__(self, capacity: int, state_dim: int):
+    def __init__(self, capacity: int, state_dim: int, seed: int = None):
         """
         Inicializa los arrays de NumPy preasignados en memoria por eficiencia.
 
         Args:
             capacity (int): Número máximo de transiciones a almacenar.
             state_dim (int): Dimensión del vector de estado.
+            seed (int, optional): Semilla para el generador local de muestreo.
         """
         self.capacity = capacity
         self.states = np.zeros((capacity, state_dim), dtype=np.float32)
@@ -60,6 +61,7 @@ class DQNReplayBuffer:
         self.next_states = np.zeros((capacity, state_dim), dtype=np.float32)
         self.dones = np.zeros((capacity, 1), dtype=bool)
 
+        self.rng = np.random.default_rng(seed)
         self.ptr = 0
         self.size = 0
 
@@ -78,7 +80,7 @@ class DQNReplayBuffer:
         """
         Extrae un lote aleatorio de transiciones y las convierte de forma segura a tensores.
         """
-        idxs = np.random.choice(self.size, size=batch_size, replace=False)
+        idxs = self.rng.choice(self.size, size=batch_size, replace=False)
         
         # Uso de torch.tensor() en lugar de torch.FloatTensor() para un manejo de memoria seguro
         return (
@@ -165,7 +167,7 @@ class DQNAgent:
     def get_action(self, state: np.ndarray) -> int:
         """Selecciona una acción siguiendo la política epsilon-greedy."""
         if random.random() < self.epsilon:
-            return self.env.action_space.sample()
+            return random.randint(0, self.env.action_space.n - 1)
 
         q_values = self.get_q_value(state)
         max_q = np.max(q_values)
