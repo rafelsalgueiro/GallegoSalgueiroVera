@@ -63,26 +63,31 @@ def plot_rewards(rewards: List[float], window_size: int = 50, title: str = "Reco
     plt.tight_layout()
     plt.show()
 
-def plot_all_rewards(labels: List[str], data_rewards: List[List[float]], window_size: int = 50, title: str = "Comparativa de Recompensa Acumulada"):
+def plot_all_rewards(data_dict: Dict[str, List[float]], window_size: int = 50, title: str = "Comparativa de Recompensa Acumulada"):
     plt.figure(figsize=(14, 7))
     
-    for lbl, rewards in zip(labels, data_rewards):
+    colores = sns.color_palette("muted", n_colors=len(data_dict))
+    
+    for i, (agent_name, rewards) in enumerate(data_dict.items()):
         current_window = window_size
         
         if current_window is not None and (current_window <= 0 or current_window > len(rewards)):
+            print(f"Aviso: Tamaño de ventana inválido para {agent_name}. Omitiendo suavizado.")
             current_window = 1
 
+        plt.plot(rewards, color=colores[i], alpha=0.15) 
+        
         if current_window > 1:
             smoothed = np.convolve(rewards, np.ones(current_window)/current_window, mode='valid')
-            plt.plot(range(current_window-1, len(rewards)), smoothed, linewidth=2, label=lbl)
+            plt.plot(range(current_window-1, len(rewards)), smoothed, color=colores[i], linewidth=2, label=agent_name)
         else:
-            plt.plot(rewards, linewidth=2, label=lbl)
+            plt.plot(rewards, color=colores[i], linewidth=2, label=agent_name)
 
     plt.xlabel('Episodios')
     plt.ylabel('Recompensa Total')
     plt.title(title)
     plt.grid(True, alpha=0.3)
-    plt.legend()
+    plt.legend(title='Algoritmos')
     plt.tight_layout()
     plt.show()
 
