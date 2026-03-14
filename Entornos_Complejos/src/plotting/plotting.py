@@ -63,6 +63,38 @@ def plot_rewards(rewards: List[float], window_size: int = 50, title: str = "Reco
     plt.tight_layout()
     plt.show()
 
+def plot_all_rewards(labels: List[str], data_rewards: List[List[float]], window_size: int = 50, title: str = "Comparativa de Recompensa Acumulada"):
+    plt.figure(figsize=(14, 7))
+    
+    for lbl, rewards in zip(labels, data_rewards):
+        current_window = window_size
+        
+        # Validación de la ventana para cada conjunto de datos
+        if current_window is not None and (current_window <= 0 or current_window > len(rewards)):
+            print(f"Aviso: Tamaño de ventana inválido para {lbl}. Omitiendo suavizado.")
+            current_window = 1
+
+        # 1. Dibujar la recompensa bruta muy transparente y capturar su color
+        line = plt.plot(rewards, alpha=0.15) 
+        color = line[0].get_color() 
+        
+        # 2. Dibujar la línea suavizada (media móvil) usando el mismo color
+        if current_window > 1:
+            smoothed = np.convolve(rewards, np.ones(current_window)/current_window, mode='valid')
+            plt.plot(range(current_window-1, len(rewards)), smoothed, color=color, linewidth=2, label=lbl)
+        else:
+            # Si se omite el suavizado, hacemos opaca la línea original para que se vea bien
+            line[0].set_alpha(0.8)
+            line[0].set_label(lbl)
+
+    plt.xlabel('Episodios')
+    plt.ylabel('Recompensa Total')
+    plt.title(title)
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
 def plot_success_rate(successes: List[int], window_size: int = 50, title: str = "Tasa de Éxito Promedio"):
     plt.figure(figsize=(14, 7))
     
