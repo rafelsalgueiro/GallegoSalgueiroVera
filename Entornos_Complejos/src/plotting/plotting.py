@@ -70,18 +70,13 @@ def plot_all_rewards(labels: List[str], data_rewards: List[List[float]], window_
         current_window = window_size
         
         if current_window is not None and (current_window <= 0 or current_window > len(rewards)):
-            print(f"Aviso: Tamaño de ventana inválido para {lbl}. Omitiendo suavizado.")
             current_window = 1
 
-        line = plt.plot(rewards, alpha=0.15) 
-        color = line[0].get_color() 
-        
         if current_window > 1:
             smoothed = np.convolve(rewards, np.ones(current_window)/current_window, mode='valid')
-            plt.plot(range(current_window-1, len(rewards)), smoothed, color=color, linewidth=2, label=lbl)
+            plt.plot(range(current_window-1, len(rewards)), smoothed, linewidth=2, label=lbl)
         else:
-            line[0].set_alpha(0.8)
-            line[0].set_label(lbl)
+            plt.plot(rewards, linewidth=2, label=lbl)
 
     plt.xlabel('Episodios')
     plt.ylabel('Recompensa Total')
@@ -90,6 +85,7 @@ def plot_all_rewards(labels: List[str], data_rewards: List[List[float]], window_
     plt.legend()
     plt.tight_layout()
     plt.show()
+
 
 def plot_success_rate(successes: List[int], window_size: int = 50, title: str = "Tasa de Éxito Promedio"):
     plt.figure(figsize=(14, 7))
