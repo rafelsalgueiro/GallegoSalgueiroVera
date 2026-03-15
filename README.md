@@ -35,7 +35,7 @@ El repositorio está organizado de forma modular para separar los distintos ámb
     * `deep_q_learning.ipynb`, `flappy_bird.ipynb` y `sarsa_semi_gradient.ipynb`: Entrenamientos y evaluaciones de los agentes aproximados sobre el entorno *Flappy Bird*.
     * `/src`: Código fuente de los agentes, del entorno y de las utilidades de graficado.
 * `/docs`: LaTeX para la elaboración de la memoria final.
-* `Extensiones_de_Marchine_Learning_1.pdf`: Memoria final del trabajo de investigación.
+* `informe.pdf`: Memoria final del trabajo de investigación.
 
 ## Instalación y Uso
 Para ejecutar los *notebooks* y reproducir los experimentos, se recomienda utilizar Google Collab.
