@@ -1,0 +1,81 @@
+% --------------------- NO TOCAR ----------------------
+\documentclass[a4paper, 10pt, twocolumn]{report}
+\input plantillaTeXpracticasRL.sty % Incluir fichero de estilo del máster
+% -----------------------------------------------------
+
+
+
+% MODIFICA ESTOS DATOS
+% Incluir el nombre de la obra y los nombres completos de los autores del trabajo, junto con el correo electrónico um.es para cada autor.
+\title{Aprendizaje por refuerzo\footnote{Máster en Inteligencia Artificial. Universidad de Murcia.}}
+\author{
+Gallego Nicolás, Juan Diego 	\\
+\texttt{jdiego.gallego@um.es} \\[0.25cm]
+Salgueiro Santacreu, Rafel 	\\
+\texttt{rafel.salgueiro@um.es} \\[0.25cm]
+Vera López, Óscar 	\\
+\texttt{oscar.veral@um.es}}
+
+
+
+\begin{document}
+
+% Carátula
+\maketitle % Puedes modificar la carátula usando el entorno titlepage.
+
+% Resumen
+\input{resumen}
+\pagenumbering{roman}
+% Índice
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+% Trabajos
+\input{bandido}
+\input{entornos_complejos}
+
+% Bibliografía
+\begin{thebibliography}{9} % El parámetro 9 indica el ancho máximo de la etiqueta, aquí "9" es un ejemplo
+	\setlength{\itemsep}{0pt} % No tocar. Reduce aún más el espacio entre ítems 
+  	\setlength{\parsep}{0pt}    % No tocar. Elimina el espacio adicional entre párrafos dentro de un ítem
+  	
+    \bibitem{robbins1952} Robbins, H. (1952). Some aspects of the sequential design of experiments. \textit{Bulletin of the American Mathematical Society}, \textit{58}(5), 527--535. \href{https://doi.org/10.1090/S0002-9904-1952-09620-8}{https://doi.org/10.1090/S0002-9904-1952-09620-8}
+
+    \bibitem{lai1985} Lai, T. L., \& Robbins, H. (1985). Asymptotically efficient adaptive allocation rules. \textit{Advances in Applied Mathematics}, \textit{6}(1), 4--22. \href{https://doi.org/10.1016/0196-8858(85)90002-8}{https://doi.org/10.1016/0196-8858(85)90002-8}
+
+    \bibitem{sutton2018} Sutton, R. S., \& Barto, A. G. (2018). \textit{Reinforcement learning: An introduction} (2nd ed.). MIT Press.
+
+    \bibitem{auer2002} Auer, P., Cesa-Bianchi, N., \& Fischer, P. (2002). Finite-time analysis of the multiarmed bandit problem. \textit{Machine Learning}, \textit{47}(2--3), 235--256. \href{https://doi.org/10.1023/A:1013689704352}{https://doi.org/10.1023/A:1013689704352}
+
+    \bibitem{auer2002} Auer, P., Cesa-Bianchi, N., \& Fischer, P. (2002). Finite-time analysis of the multiarmed bandit problem. \textit{Machine Learning}, \textit{47}(2--3), 235--256. \href{https://doi.org/10.1023/A:1013689704352}{https://doi.org/10.1023/A:1013689704352}
+
+    \bibitem{luce1959} Luce, R. D. (1959). \textit{Individual choice behavior: A theoretical analysis}. Wiley.
+
+    \bibitem{kuleshov2014} Kuleshov, V., \& Precup, D. (2014). Algorithms for the multi-armed bandit problem. \textit{Journal of Machine Learning Research}, \textit{1}, 1--48. \href{https://arxiv.org/abs/1402.6028}{https://arxiv.org/abs/1402.6028}
+
+    \bibitem{thompson1933} Thompson, W. R. (1933). On the likelihood that one unknown probability exceeds another in view of the evidence of two samples. \textit{Biometrika}, \textit{25}(3--4), 285--294. \href{https://doi.org/10.2307/2332286}{https://doi.org/10.2307/2332286}
+
+    \bibitem{russo2018} Russo, D. J., Van Roy, B., Kazerouni, A., Osband, I., \& Wen, Z. (2018). A tutorial on Thompson sampling.\textit{Foundations and Trends in Machine Learning}, \textit{11}(1), 1--96. \href{https://doi.org/10.1561/2200000070}{https://doi.org/10.1561/2200000070}
+    
+    \bibitem{watkins1989learning}
+    Watkins, C. J. C. H. (1989). \textit{Learning from Delayed Rewards} (Ph.D. thesis). King's  College, Cambridge. 
+    Available at: \url{https://www.cs.rhul.ac.uk/~chrisw/thesis.html}
+    
+    \bibitem{mnih2015humanlevel}
+    Mnih, V., Kavukcuoglu, K., Silver, D., Rusu, A. A., Veness, J., Bellemare, M. G., Graves, A.,   Riedmiller, M., Fidjeland, A. K., Ostrovski, G., et al. (2015). Human-level control through deep  reinforcement learning. \textit{Nature}, 518(7540), 529--533. 
+    DOI: \url{https://doi.org/10.1038/nature14236}
+    
+    \bibitem{vanhasselt2016deep}
+    Van Hasselt, H., Guez, A., \& Silver, D. (2016). Deep Reinforcement Learning with Double Q- Learning. In \textit{Proceedings of the AAAI Conference on Artificial Intelligence} (Vol. 30, No.    1). 
+    Available at: \url{https://arxiv.org/abs/1509.06461}
+    
+    \bibitem{ng1999policy}
+    Ng, A. Y., Harada, D., \& Russell, S. (1999). Policy invariance under reward transformations:   Theory and application to reward shaping. In \textit{Proceedings of the Sixteenth International   Conference on Machine Learning} (pp. 278--287). 
+    Available at: \url{https://people.eecs.berkeley.edu/~russell/papers/icml99-shaping.pdf}
+
+    \bibitem{ia}
+    Uso de agentes LLM para la asistencia en la elaboración de texto, toma de ideas y asistencia en la escritura de código.
+        
+    \end{thebibliography}
+
+\end{document}

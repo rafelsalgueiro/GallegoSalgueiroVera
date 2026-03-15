@@ -1,0 +1,12 @@
+% --------------------- NO TOCAR ----------------------
+\renewcommand{\abstractname}{Resumen}
+% -----------------------------------------------------
+
+% HAZ UN RESUMEN DE TU TRABAJO. ES UN RESUMEN, NO ES UNA INTRODUCCIÓN
+\begin{abstract}
+    En este trabajo se estudia el aprendizaje por refuerzo desde dos perspectivas complementarias. 
+    
+    En primer lugar, se aborda el problema del bandido de k-brazos, un escenario estático que permite analizar en profundidad el dilema exploración-explotación. Se comparan tres familias de algoritmos: $\epsilon$-\textit{greedy} (con y sin decaimiento), UCB y Softmax; sobre bandidos con distribuciones de Bernoulli, binomial y normal. Para la evaluación se utilizan las métricas de arrepentimiento acumulado y tasa de selección del brazo óptimo. Los resultados muestran que UCB destaca por su rapidez de convergencia cuando se dispone de información sobre la varianza del problema, mientras que $\epsilon$-\textit{greedy} con decaimiento ofrece un comportamiento más robusto y generalista.
+
+    En segundo lugar, se extiende el análisis a entornos con secuencialidad y estado, formalizados como Procesos de Decisión de Markov. Se evalúan métodos tabulares clásicos (Monte Carlo y diferencias temporales) en un entorno discreto de cuadrícula, y métodos de aproximación de función (SARSA semi-grediente y Deep Q-Learning ) en el entorno continuo Flappy Bird. Se estudia el impacto de técnicas como el \textit{replay buffer}, la red objetivo y el \textit{reward shaping} sobre la estabilidad y la calidad del aprendizaje.
+ \end{abstract}
