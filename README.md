@@ -18,7 +18,7 @@ ofrece un comportamiento más robusto y generalista.
 
 En segundo lugar, se extiende el análisis a entornos con secuencialidad y estado, formalizados como Procesos de Decisión de
 Markov. Se evalúan métodos tabulares clásicos (Monte Carlo y diferencias temporales) en un entorno discreto de cuadrícula,
-y métodos de aproximación de función (SARSA semi-grediente y Deep Q-Learning ) en el entorno continuo Flappy Bird. Se
+y métodos de aproximación de función (SARSA semi-grediente y Deep Q-Learning) en el entorno continuo Flappy Bird. Se
 estudia el impacto de técnicas como el replay buffer, la red objetivo y el reward shaping sobre la estabilidad y la calidad del
 aprendizaje.
 
@@ -34,6 +34,7 @@ El repositorio está organizado de forma modular para separar los distintos ámb
     * `estudio_tabulares.ipynb`: Entrenamientos y comparativas de los algoritmos tabulares sobre el entorno *SimpleGrid*.
     * `deep_q_learning.ipynb`, `flappy_bird.ipynb` y `sarsa_semi_gradient.ipynb`: Entrenamientos y evaluaciones de los agentes aproximados sobre el entorno *Flappy Bird*.
     * `/src`: Código fuente de los agentes, del entorno y de las utilidades de graficado.
+* `/docs`: LaTeX para la elaboración de la memoria final.
 * **Archivos raíz:**
     * `Extensiones_de_Marchine_Learning_1.pdf`: Memoria final del trabajo de investigación.
 
