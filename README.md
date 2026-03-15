@@ -26,8 +26,8 @@ aprendizaje.
 El repositorio está organizado de forma modular para separar los distintos ámbitos de estudio:
 
 * `/k_brazos`: Directorio principal para la resolución de los problemas de bandidos.
-    * `estudio_bernoulli.ipynb`, `estudio_binomial.ipynb` y `estudio_normal.ipynb`: Notebooks de implementación y análisis de los algoritmos sobre cada tipo de distribución.
     * `main.ipynb`: Notebook base que explica y redirige a los estudios específicos.
+    * `estudio_bernoulli.ipynb`, `estudio_binomial.ipynb` y `estudio_normal.ipynb`: Notebooks de implementación y análisis de los algoritmos sobre cada tipo de distribución.
     * `/src`: Código fuente de los agentes, los brazos y las gráficas.
 * `/Entornos_Complejos`: Directorio principal para la resolución de los MDPs.
     * `main.ipynb`: Notebook base que explica y redirige a los notebooks de implementación.
@@ -35,15 +35,14 @@ El repositorio está organizado de forma modular para separar los distintos ámb
     * `deep_q_learning.ipynb`, `flappy_bird.ipynb` y `sarsa_semi_gradient.ipynb`: Entrenamientos y evaluaciones de los agentes aproximados sobre el entorno *Flappy Bird*.
     * `/src`: Código fuente de los agentes, del entorno y de las utilidades de graficado.
 * `/docs`: LaTeX para la elaboración de la memoria final.
-* **Archivos raíz:**
-    * `Extensiones_de_Marchine_Learning_1.pdf`: Memoria final del trabajo de investigación.
+* `Extensiones_de_Marchine_Learning_1.pdf`: Memoria final del trabajo de investigación.
 
 ## Instalación y Uso
-Para ejecutar los *notebooks* y reproducir los experimentos, se recomienda utilizar un entorno virtual de Python.
+Para ejecutar los *notebooks* y reproducir los experimentos, se recomienda utilizar Google Collab.
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone [https://github.com/rafelsalgueiro/GallegoSalgueiroVera.git](https://github.com/rafelsalgueiro/GallegoSalgueiroVera.git)
+    git clone https://github.com/rafelsalgueiro/GallegoSalgueiroVera.git
     cd GallegoSalgueiroVera
     ```
 
